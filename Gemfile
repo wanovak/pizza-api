@@ -2,7 +2,9 @@
 
 source 'https://rubygems.org'
 
+gem 'rake'
 gem 'grape'
+gem 'pg'
 gem 'sequel'
 
 group :test do
