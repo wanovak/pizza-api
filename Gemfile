@@ -9,4 +9,5 @@ gem 'sequel'
 
 group :test do
   gem 'rspec'
+  gem 'byebug'
 end
