@@ -3,21 +3,30 @@
 require 'csv'
 require 'rspec/core/rake_task'
 require 'sequel'
+require_relative 'app/initializers/application.rb'
+
+namespace :api do
+  task :routes do
+    PizzaApi::API.routes.each do |route|
+      method = route.request_method.ljust(10)
+      path = route.origin
+      puts "     #{method} #{path}"
+    end
+  end
+end
 
 # XXX: If another namespace is added, relocate to lib/tasks
 namespace :db do
   desc 'Create tables on specified database'
   task :create do
-    db = db_connect
+    raise 'Problem connecting to database with provided credentials. Are credentials OK?' unless $db
 
-    raise 'Problem connecting to database with provided credentials. Are credentials OK?' unless db
-
-    db.create_table :people do
+    $db.create_table :people do
       primary_key :id
       String :name
     end
 
-    db.create_table :pizzas do
+    $db.create_table :pizzas do
       primary_key :id
       Integer :person_id
       String :type
@@ -31,8 +40,6 @@ namespace :db do
   task :seed do
     filename = 'data/data.csv'
 
-    db_connect
-    # `sequel` gem's limitations require this...
     require_relative 'app/models/person.rb'
     require_relative 'app/models/pizza.rb'
 
@@ -48,19 +55,8 @@ namespace :db do
       end
       create_pizza(data)
     end
-  end
 
-  def db_connect
-    raise 'Environment variable `PGSQL_USER` not found' if ENV['PGSQL_USER'].nil?
-    raise 'Environment variable `PGSQL_PW` not found' if ENV['PGSQL_PW'].nil?
-    raise 'Environment variable `PGSQL_DB` not found' if ENV['PGSQL_DB'].nil?
-
-    username = ENV['PGSQL_USER']
-    password = ENV['PGSQL_PW']
-    database = "#{ENV['PGSQL_DB']}_#{ENV['RACK_ENV'] || 'dev'}"
-
-    # Assuming localhost and port 5432 for brevity since this will never be deployed
-    Sequel.connect("postgres://#{username}:#{password}@localhost:5432/#{database}")
+    puts 'Tables seeded successfully!'
   end
 
   def create_person(name)
