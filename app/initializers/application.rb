@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'rack/cors'
 require_relative 'database.rb'
 require_relative 'api.rb'
 
@@ -18,6 +19,13 @@ module PizzaApi
 
     def self.instance
       @instance ||= Rack::Builder.new do
+        use Rack::Cors do
+          allow do
+            origins '*'
+            resource '*', headers: :any, methods: :get
+          end
+        end
+
         run PizzaApi::App.new
       end.to_app
     end
