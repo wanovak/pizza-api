@@ -23,7 +23,12 @@ export PGSQL_USER=pizza
 export PGSQL_PW=pizza
 export PGSQL_DB=pizza
 ```
+6. Bundle and create and seed tables
+```
+bundle install
+rake db:create
+rake db:seed
+```
 
 ## Run
-1. `bundle install`
-2. `rackup`
+1. `rackup`
